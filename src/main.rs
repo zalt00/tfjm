@@ -106,7 +106,7 @@ impl<const SIZE: usize> Links<SIZE> {
 
 
 
-pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, not_linked_b: &mut VecDeque<usize>, number_of_calls: &mut usize, memoization_table: &mut HashMap<u128, u8>, stop_at: &mut usize) -> usize {
+pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, not_linked_b: &mut VecDeque<usize>, number_of_calls: &mut usize, memoization_table: &mut HashMap<u128, u8>, stop_at: usize) -> usize {
     
     if memoization_table.contains_key(&links.get_current_hash()) {
         return *(memoization_table.get(&links.get_current_hash()).unwrap()) as usize
