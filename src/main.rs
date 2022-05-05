@@ -106,7 +106,7 @@ impl<const SIZE: usize> Links<SIZE> {
 
 
 
-pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, not_linked_b: &mut VecDeque<usize>, number_of_calls: &mut usize, memoization_table: &mut HashMap<u128, u8>) -> usize {
+pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, not_linked_b: &mut VecDeque<usize>, number_of_calls: &mut usize, memoization_table: &mut HashMap<u128, u8>, stop_at: &mut usize) -> usize {
     
     if memoization_table.contains_key(&links.get_current_hash()) {
         return *(memoization_table.get(&links.get_current_hash()).unwrap()) as usize
@@ -126,7 +126,12 @@ pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, 
             person_b = not_linked_b.pop_back().unwrap();
 
             if links.checked_add_link(person_a, person_b) {
-                current_max = usize::max(explore(links, not_linked_a, not_linked_b, number_of_calls, memoization_table) + 1, current_max);
+                current_max = usize::max(explore(links, not_linked_a, not_linked_b, number_of_calls, memoization_table, current_max) + 1, current_max);
+                if (current_max >= current_min){
+                    not_linked_b.push_front(person_b);
+                    links.remove_link(person_a, person_b);
+                    break
+                }
             }
 
             not_linked_b.push_front(person_b);
@@ -137,7 +142,9 @@ pub fn explore(links: &mut Links<MAX_SIZE>, not_linked_a: &mut VecDeque<usize>, 
         not_linked_a.push_front(person_a);
 
         current_min = usize::min(current_min, current_max);
-
+        if (current_min <= stop_at){
+            break
+        }
 
     };
     
@@ -179,7 +186,7 @@ fn main() {
     let mut number_of_calls = 0_usize;
     let mut table: HashMap<u128, u8> = HashMap::new();
     
-    let max_capa = explore(&mut links, &mut not_linked_a, &mut not_linked_b, &mut number_of_calls, &mut table);
+    let max_capa = explore(&mut links, &mut not_linked_a, &mut not_linked_b, &mut number_of_calls, &mut table, 0);
     println!("Max capacity: {}, num: {}", max_capa, number_of_calls)
 
 
